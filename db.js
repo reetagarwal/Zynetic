@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 require("dotenv").config();  
 
-const MONGO_URI = "add your link";
+const MONGO_URI = process.env.MONGO_URL
 mongoose.connect(MONGO_URI);
 
 
