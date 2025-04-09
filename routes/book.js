@@ -1,35 +1,13 @@
-
 const express = require('express');
-
 const router = express.Router();
-const zod = require("zod");
-const { User } = require("../db");
-const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../config");
+const bookController = require('../controllers/bookController');
+const { authMiddleware } = require("../middleware");
 
+router.post("/", authMiddleware, bookController.create);
+router.get("/", bookController.getAll);
+router.get("/:id", bookController.getOne);
+router.put("/:id", authMiddleware, bookController.update);
+router.delete("/:id", authMiddleware, bookController.remove);
+router.get("/search/filter", bookController.search);
 
-
-router.get("/filter", async (req, res) => {
-    const filter = req.query.filter || "";
-
-    const users = await User.find({
-        $or: [{
-            firstName: {
-                "$regex": filter
-            }
-        }, {
-            lastName: {
-                "$regex": filter
-            }
-        }]
-    })
-
-    res.json({
-        user: users.map(user => ({
-            username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            _id: user._id
-        }))
-    })
-})
+module.exports = router;

@@ -1,23 +1,75 @@
 const mongoose = require("mongoose");
 
-mongoose.connect();
+
+require("dotenv").config();  
+
+const MONGO_URI = process.env.MONGO_URI;
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
+
 
 const userSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    firstName: String,
-    lastName: String
-});
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    firstName: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    lastName: {
+        type: String,
+        required: true,
+        trim: true
+    }
+}, { timestamps: true });
 
 
 const bookSchema = new mongoose.Schema({
-    title: String,
-    author: String,
-    category: String,
-    price: Number,
-    rating: Number,
-    publishedDate: Date
-});
+    title: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    author: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    category: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    price: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 5
+    },
+    publishedDate: {
+        type: Date,
+        default: Date.now
+    }
+}, { timestamps: true });
+
 
 const User = mongoose.model("User", userSchema);
 const Book = mongoose.model("Book", bookSchema);

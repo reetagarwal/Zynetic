@@ -3,25 +3,29 @@
 
 # 📚 Bookstore Application – RESTful API
 
-A backend system for managing users and books with secure authentication, advanced filtering, and clean RESTful API design using **Node.js** and **Express.js**.
+A backend system for managing users and books with secure authentication, advanced filtering, and clean RESTful API design using **Node.js**, **Express.js**, **MongoDB**, and **JWT**. Built with a modular architecture using controllers and services for scalability.
 
 ---
 
 ## 🚀 Setup Instructions
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/yourusername/bookstore-api.git
 cd bookstore-api
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Environment Variables
-Create a `.env` file in the root directory:
+
+Create a `.env` file in the root directory with the following:
+
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
@@ -29,40 +33,49 @@ JWT_SECRET=your_jwt_secret_key
 ```
 
 ### 4. Start the Server
+
 ```bash
 npm start
 ```
+
 Server runs on `http://localhost:5000`
 
 ---
 
-## 🔐 User Authentication
+## 🔐 User Authentication Routes
 
-### POST `/api/auth/signup`
+### POST `/api/users/signup`
+
 Registers a new user.
 
 #### Request Body
+
 ```json
 {
-  "email": "user@example.com",
+  "username": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
   "password": "password123"
 }
 ```
 
 ---
 
-### POST `/api/auth/login`
-Logs in and returns a JWT token.
+### POST `/api/users/signin`
+
+Logs in the user and returns a JWT token.
 
 #### Request Body
+
 ```json
 {
-  "email": "user@example.com",
+  "username": "user@example.com",
   "password": "password123"
 }
 ```
 
 #### Response
+
 ```json
 {
   "token": "your_jwt_token"
@@ -71,15 +84,43 @@ Logs in and returns a JWT token.
 
 ---
 
-## 📚 Book API (Protected – Requires JWT)
+### PUT `/api/users`
 
-### POST `/api/books`
-Create a new book.
+Updates user details (Authenticated route).
 
 #### Headers
+
 `Authorization: Bearer <token>`
 
 #### Request Body
+
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Smith"
+}
+```
+
+---
+
+### GET `/api/users/bulk?filter=searchText`
+
+Searches users by partial match in `firstName` or `lastName`.
+
+---
+
+## 📚 Book Routes (All protected by JWT)
+
+### POST `/api/books`
+
+Create a new book.
+
+#### Headers
+
+`Authorization: Bearer <token>`
+
+#### Request Body
+
 ```json
 {
   "title": "Atomic Habits",
@@ -94,13 +135,15 @@ Create a new book.
 ---
 
 ### GET `/api/books`
-Get all books with optional filters.
+
+Get all books with advanced filters.
 
 #### Query Parameters
+
 - `author=James Clear`
 - `category=Self-help`
 - `rating=4.5`
-- `search=Atomic`
+- `title=Atomic` (partial match)
 - `sort=price|rating`
 - `page=1`
 - `limit=10`
@@ -108,17 +151,21 @@ Get all books with optional filters.
 ---
 
 ### GET `/api/books/:id`
-Get a single book by ID.
+
+Get a single book by its ID.
 
 ---
 
 ### PUT `/api/books/:id`
-Update book by ID.
+
+Update an existing book.
 
 #### Headers
+
 `Authorization: Bearer <token>`
 
 #### Request Body
+
 ```json
 {
   "price": 450,
@@ -129,37 +176,42 @@ Update book by ID.
 ---
 
 ### DELETE `/api/books/:id`
-Delete book by ID.
+
+Delete a book by ID.
 
 #### Headers
+
 `Authorization: Bearer <token>`
 
 ---
 
 ## 🚨 Error Handling
 
-- 400 Bad Request – Invalid input
-- 401 Unauthorized – No or invalid token
-- 404 Not Found – Resource not found
-- 500 Internal Server Error – Unexpected errors
+- `400` – Bad Request: Invalid data or schema violation
+- `401` – Unauthorized: Missing or invalid token
+- `404` – Not Found: Resource does not exist
+- `500` – Internal Server Error: Something went wrong
 
 ---
 
 ## 💡 Assumptions & Enhancements
 
 ### ✅ Assumptions
-- Only authenticated users can manage books.
-- Each book is unique by its title + author.
-- Passwords are hashed using bcrypt.
-- MongoDB is used with Mongoose for schema modeling.
 
-### 🔧 Enhancements (Implemented)
+- Only authenticated users can create, update, or delete books.
+- Book uniqueness is determined by title + author.
+- Passwords are securely hashed using bcrypt.
+- MongoDB is the database with Mongoose for schema definition.
+
+### 🔧 Enhancements Implemented
+
+- ✅ JWT-based secure authentication
+- ✅ User update & search functionality
 - ✅ Pagination (`page`, `limit`)
 - ✅ Sorting by `price` or `rating`
-- ✅ Filtering by `author`, `category`, and `rating`
-- ✅ Search by partial title match
-- ✅ Clean modular structure (routes, controllers, services)
-- ✅ JWT-based authentication
+- ✅ Filtering by `author`, `category`, `rating`
+- ✅ Search by partial `title`
+- ✅ Clean modular structure: controllers, services, models, routes
 
 ---
 
@@ -169,35 +221,34 @@ Delete book by ID.
 ├── config/
 │   └── db.js
 ├── controllers/
-│   ├── authController.js
-│   └── bookController.js
+│   ├── bookController.js
+│   └── userController.js
 ├── middleware/
-│   ├── auth.js
-│   └── errorHandler.js
+│   └── authMiddleware.js
 ├── models/
-│   ├── User.js
-│   └── Book.js
+│   ├── Book.js
+│   └── User.js
 ├── routes/
-│   ├── authRoutes.js
-│   └── bookRoutes.js
-├── utils/
-│   └── validators.js
+│   ├── book.js
+│   └── user.js
+├── services/
+│   ├── bookService.js
+│   └── userService.js
+├── .env
 ├── app.js
 ├── server.js
-├── .env
+├── package.json
 └── README.md
 ```
 
 ---
 
-## 🧪 Future Improvements (Bonus)
+## 🧪 Future Improvements
 
 - [ ] Add Swagger/OpenAPI documentation
-- [ ] Dockerize the application
-- [ ] Add unit and integration tests using Jest & Supertest
-- [ ] Use Prisma ORM for scalable schema modeling
+- [ ] Dockerize the application for container-based deployment
+- [ ] Add unit & integration tests using Jest and Supertest
+- [ ] Use Prisma or TypeORM for flexible schema modeling
 
 ---
-
-
 
