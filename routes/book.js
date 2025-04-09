@@ -9,12 +9,7 @@ const { JWT_SECRET } = require("../config");
 
 
 
-
-
-
-
-
-router.get("/bulk", async (req, res) => {
+router.get("/filter", async (req, res) => {
     const filter = req.query.filter || "";
 
     const users = await User.find({
